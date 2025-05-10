@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Input "nisa" to Show Text</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000; /* Fixed black background */
+    font-weight: bold;
+    user-select: none;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    color: #fff;
+  }
+  body {
+    text-align: center;
+  }
+  #inputContainer {
+    max-width: 90vw;
+    width: 320px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+  input#userInput {
+    flex: 1;
+    font-size: 5vw;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    outline: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.3s ease;
+  }
+  input#userInput::placeholder {
+    color: #ddd;
+  }
+  input#userInput:focus {
+    border-color: #33FF86;
+  }
+  button#submitBtn {
+    font-size: 5vw;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  button#submitBtn:hover,
+  button#submitBtn:focus {
+    background-color: #0056b3;
+    outline: none;
+  }
+  #dynamicText {
+    transition: color 0.3s ease, font-family 0.3s ease;
+    line-height: 1.2;
+    font-size: 7vw;
+    max-width: 90vw;
+    word-break: break-word;
+    min-height: 1.2em; /* reserved space so layout doesn't jump */
+  }
+  @media (max-width: 400px) {
+    input#userInput {
+      font-size: 6vw;
+    }
+    button#submitBtn {
+      font-size: 6vw;
+      padding: 10px 15px;
+    }
+    #dynamicText {
+      font-size: 8vw;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="inputContainer">
+    <input id="userInput" placeholder='ketik "nisa" disini' aria-label='Input word "nisa"' autocomplete="off" />
+    <button id="submitBtn" aria-label="Submit input">Submit</button>
+  </div>
+  <div id="dynamicText" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+  (function() {
+    const textElem = document.getElementById('dynamicText');
+    const inputElem = document.getElementById('userInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const fixedText = "gaffar X anugrah";
+
+    const fonts = [
+      "'Arial Black', Gadget, sans-serif",
+      "'Comic Sans MS', cursive, sans-serif",
+      "'Courier New', Courier, monospace",
+      "'Georgia', serif",
+      "'Impact', Charcoal, sans-serif",
+      "'Lucida Console', Monaco, monospace",
+      "'Tahoma', Geneva, sans-serif",
+      "'Trebuchet MS', Helvetica, sans-serif",
+      "'Verdana', Geneva, sans-serif",
+      "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+      "'Gill Sans', 'Gill Sans MT', Calibri, sans-serif",
+      "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "'Lucida Sans Unicode', 'Lucida Grande', sans-serif"
+    ];
+
+    const colors = [
+      '#FF5733', '#33FF57', '#3357FF', '#FF33A8', '#A833FF', '#33FFF6',
+      '#F6FF33', '#FF8633', '#33FF86', '#8633FF', '#FF3380', '#3380FF', '#80FF33'
+    ];
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    let animationActive = false;
+    let prevFontIndex = -1;
+    let prevTextColorIndex = -1;
+    let animationTimeoutId = null;
+
+    function changeStyle() {
+      let newFontIndex;
+      do {
+        newFontIndex = getRandomInt(0, fonts.length -1);
+      } while(newFontIndex === prevFontIndex);
+      prevFontIndex = newFontIndex;
+
+      let newTextColorIndex;
+      do {
+        newTextColorIndex = getRandomInt(0, colors.length -1);
+      } while(newTextColorIndex === prevTextColorIndex);
+      prevTextColorIndex = newTextColorIndex;
+
+      textElem.style.fontFamily = fonts[newFontIndex];
+      textElem.style.color = colors[newTextColorIndex];
+    }
+
+    function scheduleChange() {
+      if (!animationActive) return;
+      const interval = getRandomInt(200, 400);
+      animationTimeoutId = setTimeout(() => {
+        changeStyle();
+        scheduleChange();
+      }, interval);
+    }
+
+    function startAnimation() {
+      if (!animationActive) {
+        animationActive = true;
+        changeStyle();
+        scheduleChange();
+      }
+    }
+
+    function stopAnimation() {
+      animationActive = false;
+      if(animationTimeoutId !== null) {
+        clearTimeout(animationTimeoutId);
+        animationTimeoutId = null;
+      }
+      // Reset text style to default
+      textElem.style.color = "#FFFFFF";
+      textElem.style.fontFamily = "Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+    }
+
+    function updateDisplayedText() {
+      textElem.textContent = "nisa " + fixedText;
+    }
+
+    function clearDisplayedText() {
+      textElem.textContent = "";
+    }
+
+    submitBtn.addEventListener('click', () => {
+      const inputVal = inputElem.value.trim();
+      if(inputVal === "nisa") {
+        updateDisplayedText();
+        startAnimation();
+      } else {
+        stopAnimation();
+        clearDisplayedText();
+      }
+    });
+
+    inputElem.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
+
+    clearDisplayedText();
+  })();
+</script>
+</body>
+</html> 
